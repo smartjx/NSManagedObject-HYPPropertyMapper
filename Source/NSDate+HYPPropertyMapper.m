@@ -41,7 +41,7 @@
         char currentString[25] = "";
         BOOL hasTimezone = NO;
         BOOL hasMiliseconds = NO;
-
+        BOOL hasShortMiliseconds = NO;
         // ----
         // In general lines, if a Z is found, then the Z is removed since all dates operate
         // in GMT as a base, unless they have timezone, and Z is the GMT indicator.
@@ -112,6 +112,23 @@
         else if (originalString[19] == '.' && originalString[originalLength - 1] == 'Z') {
             strncpy(currentString, originalString, 19);
         }
+        // Copy all the date excluding the microseconds and the timezone also set `hasTimezone` to YES.
+        // Current date: 2015-08-23T09:29:30.000
+        // Will become:  2015-08-23T09:29:30
+        // Unit test D
+        else if (originalLength == 23 && originalString[19] == '.') {
+            strncpy(currentString, originalString, 19);
+             hasMiliseconds = YES;
+        }
+        // Copy all the date excluding the microseconds and the timezone also set `hasTimezone` to YES.
+        // Current date: 2015-08-23T09:29:30.00
+        // Will become:  2015-08-23T09:29:30
+        // Unit test D
+        else if (originalLength == 22 && originalString[19] == '.') {
+            strncpy(currentString, originalString, 19);
+             hasShortMiliseconds = YES;
+        }
+
 
         // Poorly formatted timezone
         else {
@@ -160,6 +177,13 @@
             NSString *microseconds = [trimmedDate substringToIndex:@"000".length];
             double m = microseconds.doubleValue / 1000.0;
             time += m;
+        }else if (hasShortMiliseconds)
+        {
+            NSString *trimmedDate = [dateString substringFromIndex:@"2015-09-10T00:00:00.".length];
+            NSString *microseconds = [trimmedDate substringToIndex:@"00".length];
+            double m = microseconds.doubleValue / 1000.0;
+            time += m;
+        
         }
 
         return [NSDate dateWithTimeIntervalSince1970:time];
