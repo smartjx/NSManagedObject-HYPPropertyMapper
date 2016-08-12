@@ -49,8 +49,10 @@
         // This means that `hasTimezone` will have to be set to YES, and since all timezones go to
         // the end of the date, then they will be parsed at the end of the process and appended back
         // to the parsed date.
+        // Some of the date format not included below might encounter "Signal Sigabrt", you can
+        // add manually or wait till new fix.
         // ----
-
+        
         // Copy all the date excluding the Z.
         // Current date: 2014-03-30T09:13:00Z
         // Will become:  2014-03-30T09:13:00
@@ -73,6 +75,14 @@
         // Will become:  2014-03-30T09:13:00
         // Unit test G
         else if (originalLength == 24 && originalString[originalLength - 1] == 'Z') {
+            strncpy(currentString, originalString, 19);
+            hasMiliseconds = YES;
+        }
+       // Copy all the date excluding the miliseconds.
+        // Current date: 2014-03-30T09:13:00.000
+        // Will become:  2014-03-30T09:13:00
+        // Unit test G
+        else if (originalLength == 23 && originalString[19] == '.') {
             strncpy(currentString, originalString, 19);
             hasMiliseconds = YES;
         }
